@@ -1,5 +1,6 @@
 package main;
 
+import components.background.Background;
 import components.dino.Dino;
 import components.ground.Ground;
 import components.obstacles.Obstacles;
@@ -38,6 +39,8 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
     Dino dino;
     Ground ground;
     Obstacles obstacles;
+    Background background;
+
     Score score;
     GameOver gameOverUI;
     Paused pausedUI;
@@ -51,6 +54,8 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
         dino = new Dino();
         ground = new Ground();
         obstacles = new Obstacles();
+        background = new Background();
+
         score = new Score();
         gameOverUI = new GameOver();
         pausedUI = new Paused();
@@ -83,9 +88,11 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
         gameSpeed = GAME_START_SPEED;
 
         score.reset();
+
         dino.reset();
         obstacles.reset();
         ground.reset();
+        background.reset();
 
         mainThread = new Thread(this); //TODO why "this"
         mainThread.start();
@@ -107,10 +114,12 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
     @Override
     public void paint(Graphics g) {
         super.paint(g);
+        background.draw(g);
+
         if (paused) pausedUI.draw(g);
         if (gameOver) gameOverUI.draw(g);
-
         if (!intro) score.draw(g);
+
         ground.draw(g);
         dino.draw(g);
         obstacles.draw(g);
@@ -151,6 +160,7 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
 
             // GAME LOGIC
             score.update();
+            background.update();
             dino.update();
             ground.update();
             obstacles.update();

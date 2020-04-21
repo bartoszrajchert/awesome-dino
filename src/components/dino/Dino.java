@@ -36,7 +36,7 @@ public class Dino implements Drawable {
 
     public Dino() {
         idleImage = new Resource().getResourceImage("/assets/Dino-stand.png");
-        jumpImage = idleImage;
+        jumpImage = new Resource().getResourceImage("/assets/Dino-stand.png");;
         runAnimation = new Animation(DINO_RUNNING_ANIMATION_DELTA_TIME);
         runAnimation.addFrame(new Resource().getResourceImage("/assets/Dino-left-up.png"));
         runAnimation.addFrame(new Resource().getResourceImage("/assets/Dino-right-up.png"));

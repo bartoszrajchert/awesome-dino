@@ -1,40 +1,25 @@
 package components.obstacles;
 
+import components.utility.ComponentImage;
+
 import java.awt.*;
 import java.awt.image.BufferedImage;
 
 import static components.ground.Ground.GROUND_Y;
 
-public class ObstacleImage {
-    BufferedImage image;
-    int x;
-    int y;
+public class ObstacleImage extends ComponentImage {
     private int spaceBehind;
-
-    Color debugColor;
 
     private Rectangle rectCollision;
 
     public ObstacleImage(BufferedImage image, int x) {
-        this.image = image;
-        this.x = x;
-        y = GROUND_Y - image.getHeight();
-
-        debugColor = Color.red;
+        super(image, x, GROUND_Y - image.getHeight(), Color.red);
 
         rectCollision = new Rectangle();
         rectCollision.x = this.x;
         rectCollision.y = y;
         rectCollision.width = image.getWidth();
         rectCollision.height = image.getHeight();
-    }
-
-    public ObstacleImage(BufferedImage image, int x, Color debugColor) {
-        this.image = image;
-        this.x = x;
-        y = GROUND_Y - image.getHeight();
-
-        this.debugColor = debugColor;
     }
 
     public void setSpaceBehind(int spaceBehind) {

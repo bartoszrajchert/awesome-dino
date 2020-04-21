@@ -1,5 +1,9 @@
 ## AWESOME DINO
-Game for CS
+A Java version ot the offline T-Rex chrome game.
+Some features are missing, some additional has been added.
+Game works on **60 fps**.
+
+Game is for my CS project.
 ### Features
    - Obstacles manager
    - Infinitely moving ground
@@ -8,6 +12,7 @@ Game for CS
    - Faster fall
    - Leveling system
    - Pause
+   - Moving background
    - **EASTER EGG** _(search for it in intro screen)_
 
 ### Keybinds:
