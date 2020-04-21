@@ -1,3 +1,4 @@
+![Picture of the game](pic-of-the-game.png)
 ## AWESOME DINO
 A Java version ot the offline T-Rex chrome game.
 Some features are missing, some additional has been added.
@@ -13,6 +14,8 @@ Game is for my CS project.
    - Leveling system
    - Pause
    - Moving background
+   - Changing background color
+   - Sounds
    - **EASTER EGG** _(search for it in intro screen)_
 
 ### Keybinds:

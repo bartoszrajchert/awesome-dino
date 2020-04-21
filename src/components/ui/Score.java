@@ -1,5 +1,7 @@
 package components.ui;
 
+import components.background.Background;
+import components.background.BackgroundColors;
 import components.utility.Sound;
 import components.utility.DeltaTime;
 import interfaces.Drawable;
@@ -45,9 +47,17 @@ public class Score implements Drawable {
     }
 
     private void changeGameSpeed() {
-        if (score%220 == 0 && !isChanged && gameSpeed < GAME_MAX_SPEED) {
+        if (score > 0 && score%220 == 0 && !isChanged && gameSpeed < GAME_MAX_SPEED) {
             isChanged = true;
             gameSpeed += 1;
+        }
+    }
+
+    private void changeBackgroundColor() {
+        if (score > 0 && score%1200 == 0) {
+            Background.setWhichBackgroundColor(BackgroundColors.DARK);
+        } else if (score > 0 && score%1800 == 0) {
+            Background.setWhichBackgroundColor(BackgroundColors.DEFAULT);
         }
     }
 
@@ -118,6 +128,7 @@ public class Score implements Drawable {
 
         playSound();
         changeGameSpeed();
+        changeBackgroundColor();
     }
 
     @Override
@@ -126,7 +137,7 @@ public class Score implements Drawable {
         g.setFont(new Font("Consolas", Font.BOLD, 18));
         g.drawString(scoreBuilder(score), WINDOW_WIDTH - 100, 40);
         g.setColor(Color.LIGHT_GRAY);
-        g.drawString("HS " + scoreBuilder(highScore), WINDOW_WIDTH - 200, 40);
+        g.drawString("HI " + scoreBuilder(highScore), WINDOW_WIDTH - 200, 40);
     }
 
     @Override

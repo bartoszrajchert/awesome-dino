@@ -8,12 +8,14 @@ import components.ui.GameOver;
 import components.ui.Intro;
 import components.ui.Paused;
 import components.ui.Score;
-import components.utility.Resource;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+
+import static main.GameWindow.WINDOW_HEIGHT;
+import static main.GameWindow.WINDOW_WIDTH;
 
 // TODO: https://stackoverflow.com/questions/43444193/use-addkeylistener-in-a-class-to-listen-keys-from-another-class
 // TODO: w pewnych statach Dino trzeba blkować dostęp do innych klawisz (czyli żeby nic robiły)
@@ -47,7 +49,7 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
     Intro introUI;
 
     public GamePanel() {
-        setSize(GameWindow.WINDOW_WIDTH, GameWindow.WINDOW_HEIGHT);
+        setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
 
         gameSpeed = GAME_START_SPEED;
 
@@ -123,6 +125,8 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
         ground.draw(g);
         dino.draw(g);
         obstacles.draw(g);
+
+        if (intro) introUI.draw(g);
     }
 
     /*
@@ -178,9 +182,7 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
     }
 
     @Override
-    public void keyTyped(KeyEvent e) {
-
-    }
+    public void keyTyped(KeyEvent e) { }
 
     @Override
     public void keyPressed(KeyEvent e) {
@@ -216,7 +218,6 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
         if(e.getKeyChar() == 's' || e.getKeyCode() == KeyEvent.VK_DOWN) {
             if(!paused && running) {
                 dino.fall();
-//                dino.crouch();
             }
         }
 
@@ -233,12 +234,5 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
     }
 
     @Override
-    public void keyReleased(KeyEvent e) {
-        // When pressing fast up and down key it will fly
-//        if(e.getKeyChar() == 's' || e.getKeyCode() == KeyEvent.VK_DOWN) {
-//            if(!paused && running) {
-//                dino.run();
-//            }
-//        }
-    }
+    public void keyReleased(KeyEvent e) { }
 }

@@ -8,8 +8,8 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
-import static main.GamePanel.DEBUG_MODE;
-import static main.GamePanel.gameSpeed;
+import static main.GamePanel.*;
+import static main.GameWindow.WINDOW_HEIGHT;
 import static main.GameWindow.WINDOW_WIDTH;
 
 public class Background implements Drawable {
@@ -18,48 +18,64 @@ public class Background implements Drawable {
 
     private int backgroundSpeed = gameSpeed / 3;
 
-    ComponentImage first;
-    ComponentImage second;
-    ComponentImage third;
+    private static BackgroundColors whichBackgroundColor;
+
+    ComponentImage firstCloud;
+    ComponentImage secondCloud;
+    ComponentImage thirdCloud;
 
     public Background() {
         cloud = new Resource().getResourceImage("/assets/Cloud.png");
+        whichBackgroundColor = BackgroundColors.DEFAULT;
 
         backgroundInit();
     }
 
-    public void backgroundInit() {
+    public static void setWhichBackgroundColor(BackgroundColors whichBackgroundColor) {
+        Background.whichBackgroundColor = whichBackgroundColor;
+    }
+
+    private void backgroundInit() {
         cloudImages = new ArrayList<>();
         cloudImages.add(new ComponentImage(cloud, WINDOW_WIDTH - 700, 40, Color.LIGHT_GRAY));
         cloudImages.add(new ComponentImage(cloud, WINDOW_WIDTH - 400, 20, Color.LIGHT_GRAY));
         cloudImages.add(new ComponentImage(cloud, WINDOW_WIDTH - 200, 80, Color.LIGHT_GRAY));
 
-        first = cloudImages.get(0);
-        second = cloudImages.get(1);
-        third = cloudImages.get(2);
+        firstCloud = cloudImages.get(0);
+        secondCloud = cloudImages.get(1);
+        thirdCloud = cloudImages.get(2);
     }
 
     @Override
     public void update() {
-        first.x -= backgroundSpeed;
-        second.x -= backgroundSpeed;
-        third.x -= backgroundSpeed;
+        firstCloud.x -= backgroundSpeed;
+        secondCloud.x -= backgroundSpeed;
+        thirdCloud.x -= backgroundSpeed;
 
-        if (first.x <= -first.image.getWidth()) {
-            first.x = WINDOW_WIDTH;
+        if (firstCloud.x <= -firstCloud.image.getWidth()) {
+            firstCloud.x = WINDOW_WIDTH;
         }
 
-        if (second.x <= -second.image.getWidth()) {
-            second.x = WINDOW_WIDTH;
+        if (secondCloud.x <= -secondCloud.image.getWidth()) {
+            secondCloud.x = WINDOW_WIDTH;
         }
 
-        if (third.x <= -third.image.getWidth()) {
-            third.x = WINDOW_WIDTH;
+        if (thirdCloud.x <= -thirdCloud.image.getWidth()) {
+            thirdCloud.x = WINDOW_WIDTH;
         }
     }
 
     @Override
     public void draw(Graphics g) {
+        switch (whichBackgroundColor){
+            case DEFAULT:
+                break;
+            case DARK:
+                g.setColor(Color.BLACK);
+                g.fillRect(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
+                break;
+        }
+
         for (ComponentImage clouds : cloudImages) {
             if (DEBUG_MODE) {
                 g.setColor(clouds.debugColor);
@@ -72,5 +88,6 @@ public class Background implements Drawable {
     @Override
     public void reset() {
         backgroundInit();
+        whichBackgroundColor = BackgroundColors.DEFAULT;
     }
 }
