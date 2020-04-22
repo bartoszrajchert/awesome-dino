@@ -2,12 +2,12 @@
 ## AWESOME DINO
 A Java version ot the offline T-Rex chrome game.
 Some features are missing, some additional has been added.
-Game works on **60 fps**.
+Game works on ~**60 fps**.
 
 Game is for my CS project.
 ### Features
    - Obstacles manager
-   - Infinitely moving ground
+   - Moving ground
    - Jump
    - Score & High Score _(W/R file)_
    - Faster fall
@@ -17,6 +17,8 @@ Game is for my CS project.
    - Changing background color
    - Sounds
    - **EASTER EGG** _(search for it in intro screen)_
+   - Collisions + array of collision box (for example) 
+   ![Picture of dino collision box](dino-collision-box.png)
 
 ### Keybinds:
 ##### Jump: `SPACE`, `w`, `ARROW UP`

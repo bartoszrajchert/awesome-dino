@@ -116,6 +116,7 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
     @Override
     public void paint(Graphics g) {
         super.paint(g);
+
         background.draw(g);
 
         if (paused) pausedUI.draw(g);
@@ -132,11 +133,22 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
     /*
      * Main game loop
      */
-    // TODO:
-    //  https://gamedev.stackexchange.com/questions/160329/java-game-loop-efficiency
-    //  https://stackoverflow.com/questions/18283199/java-main-game-loop
+
+    /**
+     * MAIN GAME LOOP
+     *
+     * I'm aware that Thread.sleep() is not a good practice but it is
+     * good enough for this game.
+     *
+     * ------------------------------------------------------------------------
+     * Good resources:
+     *  - https://gamedev.stackexchange.com/questions/160329/java-game-loop-efficiency
+     *  - https://stackoverflow.com/questions/18283199/java-main-game-loop
+     */
+
     @Override
     public void run() {
+        // INTRO LOOP
         while (intro) {
             try {
                 int msPerFrame = 1000 / GAME_FPS;
@@ -144,8 +156,10 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
+
             repaint();
         }
+
         while(running) {
             // GAME TIMING
             try {
@@ -174,6 +188,7 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
                 score.writeHighScore();
                 gameOver = true;
                 running = false;
+                System.out.println("Game over");
             }
 
             // RENDER OUTPUT
@@ -207,6 +222,7 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
             if (!running && !gameOver) {
                 startGame();
                 dino.run();
+                dino.jump();
             } else if (gameOver) {
                 resetGame();
             }

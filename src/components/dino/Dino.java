@@ -1,5 +1,6 @@
 package components.dino;
 
+import components.utility.CollisionBox;
 import interfaces.Drawable;
 import components.utility.Sound;
 import components.utility.Animation;
@@ -7,6 +8,7 @@ import components.utility.Resource;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 
 import static components.ground.Ground.GROUND_Y;
 import static main.GamePanel.DEBUG_MODE;
@@ -18,11 +20,11 @@ public class Dino implements Drawable {
     private static final float DINO_START_X = 50;
     private static int DINO_RUNNING_ANIMATION_DELTA_TIME = 60;
 
-    private DinoStates dinoState;
+    private static DinoStates dinoState;
 
-    private float x, y;
-    private float TEMP_y;
-    private float speedY;
+    private static float x, y;
+    private static float TEMP_y;
+    private static float speedY;
 
     private static BufferedImage idleImage;
     private static BufferedImage jumpImage;
@@ -30,9 +32,9 @@ public class Dino implements Drawable {
     private static Animation crouchAnimation;
     private static BufferedImage dieImage;
 
-    private static Rectangle rectCollision;
+    public static ArrayList<CollisionBox> constructedCollisionBox;
 
-    private Sound jumpSound;
+    private static Sound jumpSound;
 
     public Dino() {
         idleImage = new Resource().getResourceImage("/assets/Dino-stand.png");
@@ -49,51 +51,43 @@ public class Dino implements Drawable {
         y = GROUND_Y - idleImage.getHeight();
         dinoState = DinoStates.IDLE;
 
-        rectCollision = new Rectangle();
-        rectCollision.x = (int) x;
-        rectCollision.y = (int) y;
-
         jumpSound = new Sound("/assets/sounds/button-press.wav");
+
+        // Collision adjustments.
+        // It is modified version from chromium source code.
+        // ---------------------------------------------------
+        //    ______
+        //  _|      |-|
+        // | |<---->| |
+        // |_| dino |_|
+        //   |_____ |
+        int borderSize = 1;
+        constructedCollisionBox = new ArrayList<>();
+        constructedCollisionBox.add(new CollisionBox((int) x, (int) y + 15, 11 - borderSize, 21 - borderSize));
+        constructedCollisionBox.add(new CollisionBox((int) x + 10, (int) y, 22 - borderSize, 45 - borderSize));
+        constructedCollisionBox.add(new CollisionBox((int) x + 31, (int) y, 10 - borderSize, 21 - borderSize));
     }
 
     @Override
     public void draw(Graphics g) {
+        if (DEBUG_MODE) {
+            for (CollisionBox collisionBox : constructedCollisionBox) {
+                g.setColor(Color.BLACK);
+                g.drawRect(collisionBox.x, collisionBox.y, collisionBox.width, collisionBox.height);
+            }
+        }
         switch (dinoState) {
             case IDLE:
-                if (DEBUG_MODE) {
-                    g.setColor(Color.BLACK);
-                    g.drawRect((int) x, (int) y, idleImage.getWidth(), idleImage.getHeight());
-                }
                 g.drawImage(idleImage, (int)x, (int)y, null);
                 break;
             case JUMPING:
-                if (DEBUG_MODE) {
-                    g.setColor(Color.BLACK);
-                    g.drawRect((int) x, (int) y, jumpImage.getWidth(), jumpImage.getHeight());
-                }
                 g.drawImage(jumpImage, (int)x, (int)y, null);
-                break;
-            case CROUCHING:
-                crouchAnimation.update();
-                if (DEBUG_MODE) {
-                    g.setColor(Color.BLACK);
-                    g.drawRect((int) x, (int) y + idleImage.getHeight() - crouchAnimation.getFrame().getHeight(), crouchAnimation.getFrame().getWidth(), crouchAnimation.getFrame().getHeight());
-                }
-                g.drawImage(crouchAnimation.getFrame(), (int)x, (int)y + idleImage.getHeight() - crouchAnimation.getFrame().getHeight(), null);
                 break;
             case RUNNING:
                 runAnimation.update();
-                if (DEBUG_MODE) {
-                    g.setColor(Color.BLACK);
-                    g.drawRect((int) x, (int) y, runAnimation.getFrame().getWidth(), runAnimation.getFrame().getHeight());
-                }
                 g.drawImage(runAnimation.getFrame(), (int)x, (int)y, null);
                 break;
             case DIE:
-                if (DEBUG_MODE) {
-                    g.setColor(Color.BLACK);
-                    g.drawRect((int) x, (int) y, idleImage.getWidth(), idleImage.getHeight());
-                }
                 g.drawImage(dieImage, (int)x, (int)y, null);
                 break;
         }
@@ -110,23 +104,26 @@ public class Dino implements Drawable {
             y += speedY;
             TEMP_y = y;
         }
+        if (constructedCollisionBox.size() > 1) {
+            constructedCollisionBox.get(0).x = (int) x;
+            constructedCollisionBox.get(0).y = (int) y + 15;
 
-        rectCollision.x = (int) x;
-        rectCollision.y = (int) y;
-        if (dinoState != DinoStates.CROUCHING) {
-            rectCollision.height = idleImage.getHeight();
-            rectCollision.width = idleImage.getWidth();
+            constructedCollisionBox.get(1).x = (int) x + 10;
+            constructedCollisionBox.get(1).y = (int) y;
+
+            constructedCollisionBox.get(2).x = (int) x + 31;
+            constructedCollisionBox.get(2).y = (int) y;
+        } else {
+            constructedCollisionBox.get(0).x = (int) x;
+            constructedCollisionBox.get(0).y = (int) y;
         }
+
     }
 
     @Override
     public void reset() {
         y = GROUND_Y - idleImage.getHeight();
         run();
-    }
-
-    public static Rectangle getRectCollision() {
-        return rectCollision;
     }
 
     public void run() {
@@ -136,6 +133,7 @@ public class Dino implements Drawable {
     public void jump() {
         if (dinoState == DinoStates.RUNNING) {
             dinoState = DinoStates.JUMPING;
+
             speedY = -DINO_JUMP_STRENGTH;
             y += speedY;
 
@@ -150,13 +148,6 @@ public class Dino implements Drawable {
         }
     }
 
-//    public void crouch() {
-//        if (dinoState != DinoStates.JUMPING) {
-//            dinoState = DinoStates.CROUCHING;
-//            crouchAnimation.update();
-//        }
-//    }
-
     public void die() {
         dinoState = DinoStates.DIE;
     }
@@ -170,5 +161,8 @@ public class Dino implements Drawable {
         runAnimation.addFrame(new Resource().getResourceImage("/assets/mario/Mario-left-up.png"));
         runAnimation.addFrame(new Resource().getResourceImage("/assets/mario/Mario-right-up.png"));
         dieImage = new Resource().getResourceImage("/assets/mario/Mario-dead.png");
+
+        constructedCollisionBox = new ArrayList<>();
+        constructedCollisionBox.add(new CollisionBox((int) x, (int) y, idleImage.getWidth(), idleImage.getHeight()));
     }
 }

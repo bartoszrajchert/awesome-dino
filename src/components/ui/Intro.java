@@ -1,5 +1,6 @@
 package components.ui;
 
+import components.dino.Dino;
 import components.utility.Resource;
 import components.utility.Sound;
 import interfaces.Drawable;
@@ -10,7 +11,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 
-import static components.dino.Dino.setMario;
 import static main.GameWindow.WINDOW_HEIGHT;
 import static main.GameWindow.WINDOW_WIDTH;
 
@@ -28,8 +28,8 @@ public class Intro implements Drawable {
             @Override
             public void mouseClicked(MouseEvent e) {
                 IS_MARIO = true;
-                setMario();
                 changeIntroTextToMario();
+                Dino.setMario();
                 overworld.playInLoop();
             }
         });

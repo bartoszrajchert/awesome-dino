@@ -1,6 +1,7 @@
 package components.obstacles;
 
 import components.dino.Dino;
+import components.utility.CollisionBox;
 import interfaces.Drawable;
 import components.utility.Resource;
 
@@ -46,13 +47,13 @@ public class Obstacles implements Drawable {
     public ObstacleImage getRandomObstacle() {
         int randCactus = (int) (Math.random() * (obstacleImages.size()));
         ObstacleImage randObstacle = obstacleImages.get(randCactus);
-        return new ObstacleImage(randObstacle.image, randObstacle.x);
+        return new ObstacleImage(randObstacle.getImage(), randObstacle.getX());
     }
 
     public ObstacleImage getRandomObstacle(int x) {
         int randCactus = (int) (Math.random() * (obstacleImages.size()));
         ObstacleImage randObstacle = obstacleImages.get(randCactus);
-        return new ObstacleImage(randObstacle.image, x);
+        return new ObstacleImage(randObstacle.getImage(), x);
     }
 
     public int getRandomSpace() {
@@ -67,10 +68,10 @@ public class Obstacles implements Drawable {
 
             incomingObstacles.add(rand);
             if (i == 0) {
-                incomingObstacles.get(0).x = OBSTACLES_FIRST_OBSTACLE_X;
+                incomingObstacles.get(0).setX(OBSTACLES_FIRST_OBSTACLE_X);
                 incomingObstacles.get(0).setSpaceBehind(getRandomSpace());
             } else {
-                incomingObstacles.get(i).x = incomingObstacles.get(i - 1).x + incomingObstacles.get(i - 1).getSpaceBehind();
+                incomingObstacles.get(i).setX(incomingObstacles.get(i - 1).getX() + incomingObstacles.get(i - 1).getSpaceBehind());
                 incomingObstacles.get(i).setSpaceBehind(getRandomSpace());
             }
         }
@@ -82,13 +83,13 @@ public class Obstacles implements Drawable {
 
     public void update() {
         for (ObstacleImage obstacle : incomingObstacles) {
-            obstacle.setX(obstacle.x - gameSpeed);
+            obstacle.setX(obstacle.getX() - gameSpeed);
         }
 
-        if (incomingObstacles.get(0).x < -incomingObstacles.get(0).image.getWidth()) {
+        if (incomingObstacles.get(0).getX() < -incomingObstacles.get(0).getImage().getWidth()) {
             incomingObstacles.remove(0);
             incomingObstacles.add(getRandomObstacle(
-                    incomingObstacles.get(incomingObstacles.size() - 1).x + incomingObstacles.get(incomingObstacles.size() - 1).getSpaceBehind()
+                    incomingObstacles.get(incomingObstacles.size() - 1).getX() + incomingObstacles.get(incomingObstacles.size() - 1).getSpaceBehind()
             ));
             incomingObstacles.get(incomingObstacles.size() - 1).setSpaceBehind(getRandomSpace());
         }
@@ -98,8 +99,8 @@ public class Obstacles implements Drawable {
 
     public boolean isCollision() {
         for (ObstacleImage obstacle : incomingObstacles) {
-            if (Dino.getRectCollision().intersects(obstacle.getRectCollision())) {
-                System.out.println("Collision");
+            for (CollisionBox dinoCollisionBox : Dino.constructedCollisionBox)
+            if (dinoCollisionBox.intersects(obstacle.collisionBox)) {
                 return true;
             }
         }
@@ -109,10 +110,10 @@ public class Obstacles implements Drawable {
     public void draw(Graphics g) {
         for (ObstacleImage obstacle : incomingObstacles) {
             if (DEBUG_MODE) {
-                g.setColor(obstacle.debugColor);
-                g.drawRect(obstacle.x, obstacle.y, obstacle.image.getWidth(), obstacle.image.getHeight());
+                g.setColor(obstacle.getDebugColor());
+                g.drawRect(obstacle.collisionBox.x, obstacle.collisionBox.y, obstacle.collisionBox.width, obstacle.collisionBox.height);
             }
-            g.drawImage(obstacle.image, obstacle.x, obstacle.y, null);
+            g.drawImage(obstacle.getImage(), obstacle.getX(), obstacle.getY(), null);
         }
     }
 }
