@@ -1,10 +1,7 @@
 package components.dino;
 
-import components.utility.CollisionBox;
+import components.utility.*;
 import interfaces.Drawable;
-import components.utility.Sound;
-import components.utility.Animation;
-import components.utility.Resource;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -23,18 +20,31 @@ public class Dino implements Drawable {
     private static DinoStates dinoState;
 
     private static float x, y;
-    private static float TEMP_y;
     private static float speedY;
+
+    /**
+     * This variable is for checking y before dino hit the ground.
+     * Without it dino for msPerFrame ms is under the ground.
+     */
+    private static float TEMP_y;
 
     private static BufferedImage idleImage;
     private static BufferedImage jumpImage;
     private static Animation runAnimation;
-    private static Animation crouchAnimation;
     private static BufferedImage dieImage;
 
-    public static ArrayList<CollisionBox> constructedCollisionBox;
+    public static ArrayList<Coordinates> constructedCoordinates;
+    private static Coordinates collisionLeft;
+    private static Coordinates collisionMiddle;
+    private static Coordinates collisionRight;
+
+    /**
+     * It eliminates system delay between typed key event and pressed key event
+     */
+    public static boolean jumpRequested;
 
     private static Sound jumpSound;
+    public static Sound gameOverSound;
 
     public Dino() {
         idleImage = new Resource().getResourceImage("/assets/Dino-stand.png");
@@ -42,9 +52,6 @@ public class Dino implements Drawable {
         runAnimation = new Animation(DINO_RUNNING_ANIMATION_DELTA_TIME);
         runAnimation.addFrame(new Resource().getResourceImage("/assets/Dino-left-up.png"));
         runAnimation.addFrame(new Resource().getResourceImage("/assets/Dino-right-up.png"));
-        crouchAnimation = new Animation(DINO_RUNNING_ANIMATION_DELTA_TIME);
-        crouchAnimation.addFrame(new Resource().getResourceImage("/assets/Dino-below-left-up.png"));
-        crouchAnimation.addFrame(new Resource().getResourceImage("/assets/Dino-below-right-up.png"));
         dieImage = new Resource().getResourceImage("/assets/Dino-big-eyes.png");
 
         x = DINO_START_X;
@@ -52,28 +59,34 @@ public class Dino implements Drawable {
         dinoState = DinoStates.IDLE;
 
         jumpSound = new Sound("/assets/sounds/button-press.wav");
+        gameOverSound = new Sound("/assets/sounds/hit.wav");
 
         // Collision adjustments.
         // It is modified version from chromium source code.
         // ---------------------------------------------------
         //    ______
         //  _|      |-|
-        // | |<---->| |
-        // |_| dino |_|
+        // | | dino | |
+        // |_|      |_|
         //   |_____ |
         int borderSize = 1;
-        constructedCollisionBox = new ArrayList<>();
-        constructedCollisionBox.add(new CollisionBox((int) x, (int) y + 15, 11 - borderSize, 21 - borderSize));
-        constructedCollisionBox.add(new CollisionBox((int) x + 10, (int) y, 22 - borderSize, 45 - borderSize));
-        constructedCollisionBox.add(new CollisionBox((int) x + 31, (int) y, 10 - borderSize, 21 - borderSize));
+        constructedCoordinates = new ArrayList<>();
+
+        collisionLeft = new Coordinates(0, 15, 11 - borderSize, 21 - borderSize);
+        collisionMiddle = new Coordinates(10, 0, 22 - borderSize, 45 - borderSize);
+        collisionRight = new Coordinates(31, 0, 10 - borderSize, 21 - borderSize);
+
+        constructedCoordinates.add(new Coordinates((int) x, (int) y + collisionLeft.y, collisionLeft.width, collisionLeft.height));
+        constructedCoordinates.add(new Coordinates((int) x + collisionMiddle.x, (int) y, collisionMiddle.width, collisionMiddle.height));
+        constructedCoordinates.add(new Coordinates((int) x + collisionRight.x, (int) y, collisionRight.width, collisionRight.height));
     }
 
     @Override
     public void draw(Graphics g) {
         if (DEBUG_MODE) {
-            for (CollisionBox collisionBox : constructedCollisionBox) {
+            for (Coordinates coordinates : constructedCoordinates) {
                 g.setColor(Color.BLACK);
-                g.drawRect(collisionBox.x, collisionBox.y, collisionBox.width, collisionBox.height);
+                g.drawRect(coordinates.x, coordinates.y, coordinates.width, coordinates.height);
             }
         }
         switch (dinoState) {
@@ -93,29 +106,36 @@ public class Dino implements Drawable {
         }
     }
 
+    /**
+     *
+     */
     @Override
     public void update() {
         if((TEMP_y + speedY) >= GROUND_Y - idleImage.getHeight()) {
             speedY = 0;
             y = GROUND_Y - idleImage.getHeight();
             run();
+            if (jumpRequested) {
+                jump();
+                jumpRequested = false;
+            }
         } else if (dinoState == DinoStates.JUMPING){
             speedY += GAME_GRAVITY;
             y += speedY;
             TEMP_y = y;
         }
-        if (constructedCollisionBox.size() > 1) {
-            constructedCollisionBox.get(0).x = (int) x;
-            constructedCollisionBox.get(0).y = (int) y + 15;
+        if (constructedCoordinates.size() > 1) {
+            constructedCoordinates.get(0).x = (int) x;
+            constructedCoordinates.get(0).y = (int) y + collisionLeft.y;
 
-            constructedCollisionBox.get(1).x = (int) x + 10;
-            constructedCollisionBox.get(1).y = (int) y;
+            constructedCoordinates.get(1).x = (int) x + collisionMiddle.x;
+            constructedCoordinates.get(1).y = (int) y;
 
-            constructedCollisionBox.get(2).x = (int) x + 31;
-            constructedCollisionBox.get(2).y = (int) y;
+            constructedCoordinates.get(2).x = (int) x + collisionRight.x;
+            constructedCoordinates.get(2).y = (int) y;
         } else {
-            constructedCollisionBox.get(0).x = (int) x;
-            constructedCollisionBox.get(0).y = (int) y;
+            constructedCoordinates.get(0).x = (int) x;
+            constructedCoordinates.get(0).y = (int) y;
         }
 
     }
@@ -137,7 +157,13 @@ public class Dino implements Drawable {
             speedY = -DINO_JUMP_STRENGTH;
             y += speedY;
 
+            // It prevents from layering sounds and game freeze
+            if (!jumpSound.isNull()) {
+                if (jumpSound.isOpen()) jumpSound.stop();
+            }
             jumpSound.play();
+        } else if (dinoState == DinoStates.JUMPING) {
+            jumpRequested = true;
         }
     }
 
@@ -150,6 +176,7 @@ public class Dino implements Drawable {
 
     public void die() {
         dinoState = DinoStates.DIE;
+        gameOverSound.play();
     }
 
     public static void setMario() {
@@ -162,7 +189,10 @@ public class Dino implements Drawable {
         runAnimation.addFrame(new Resource().getResourceImage("/assets/mario/Mario-right-up.png"));
         dieImage = new Resource().getResourceImage("/assets/mario/Mario-dead.png");
 
-        constructedCollisionBox = new ArrayList<>();
-        constructedCollisionBox.add(new CollisionBox((int) x, (int) y, idleImage.getWidth(), idleImage.getHeight()));
+        jumpSound = new Sound("/assets/sounds/mario/jump.wav");
+        gameOverSound = new Sound("/assets/sounds/mario/dead.wav");
+
+        constructedCoordinates = new ArrayList<>();
+        constructedCoordinates.add(new Coordinates((int) x, (int) y, idleImage.getWidth(), idleImage.getHeight()));
     }
 }

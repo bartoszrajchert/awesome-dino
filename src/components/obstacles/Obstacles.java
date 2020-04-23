@@ -1,7 +1,7 @@
 package components.obstacles;
 
 import components.dino.Dino;
-import components.utility.CollisionBox;
+import components.utility.Coordinates;
 import interfaces.Drawable;
 import components.utility.Resource;
 
@@ -99,8 +99,8 @@ public class Obstacles implements Drawable {
 
     public boolean isCollision() {
         for (ObstacleImage obstacle : incomingObstacles) {
-            for (CollisionBox dinoCollisionBox : Dino.constructedCollisionBox)
-            if (dinoCollisionBox.intersects(obstacle.collisionBox)) {
+            for (Coordinates dinoCoordinates : Dino.constructedCoordinates)
+            if (dinoCoordinates.intersects(obstacle.coordinates)) {
                 return true;
             }
         }
@@ -111,7 +111,7 @@ public class Obstacles implements Drawable {
         for (ObstacleImage obstacle : incomingObstacles) {
             if (DEBUG_MODE) {
                 g.setColor(obstacle.getDebugColor());
-                g.drawRect(obstacle.collisionBox.x, obstacle.collisionBox.y, obstacle.collisionBox.width, obstacle.collisionBox.height);
+                g.drawRect(obstacle.coordinates.x, obstacle.coordinates.y, obstacle.coordinates.width, obstacle.coordinates.height);
             }
             g.drawImage(obstacle.getImage(), obstacle.getX(), obstacle.getY(), null);
         }

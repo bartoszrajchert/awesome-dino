@@ -17,9 +17,6 @@ import java.awt.event.KeyListener;
 import static main.GameWindow.WINDOW_HEIGHT;
 import static main.GameWindow.WINDOW_WIDTH;
 
-// TODO: https://stackoverflow.com/questions/43444193/use-addkeylistener-in-a-class-to-listen-keys-from-another-class
-// TODO: w pewnych statach Dino trzeba blkować dostęp do innych klawisz (czyli żeby nic robiły)
-
 public class GamePanel extends JPanel implements Runnable, KeyListener {
     public static boolean DEBUG_MODE = false;
 
@@ -33,7 +30,7 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
     private Thread mainThread;
 
     public boolean running = false;
-    public boolean paused = false;              // TODO: https://www.geeksforgeeks.org/volatile-keyword-in-java/
+    public boolean paused = false;
     public boolean gameOver = false;
     public boolean intro = true;
     final Object pauseLock = new Object();
@@ -71,9 +68,6 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
         setVisible(true);
     }
 
-    /*
-     * Game status methods
-     */
     public void startGame() {
         System.out.println("\n=====================GAME LOG=====================");
         System.out.println("Let the game begin\n");
@@ -95,6 +89,13 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
         obstacles.reset();
         ground.reset();
         background.reset();
+
+        if (introUI.IS_MARIO) {
+            introUI.overworld.playInLoop();
+
+            // It prevents from layering sounds
+            if (dino.gameOverSound.isOpen()) dino.gameOverSound.stop();
+        }
 
         mainThread = new Thread(this); //TODO why "this"
         mainThread.start();
@@ -130,10 +131,6 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
         if (intro) introUI.draw(g);
     }
 
-    /*
-     * Main game loop
-     */
-
     /**
      * MAIN GAME LOOP
      *
@@ -148,7 +145,7 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
 
     @Override
     public void run() {
-        // INTRO LOOP
+        // INTRO LOOP FOR EASTER EGG
         while (intro) {
             try {
                 int msPerFrame = 1000 / GAME_FPS;
@@ -160,6 +157,7 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
             repaint();
         }
 
+        // MAIN GAME LOOP
         while(running) {
             // GAME TIMING
             try {
@@ -185,6 +183,7 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
 
             if (obstacles.isCollision()) {
                 dino.die();
+                if (introUI.IS_MARIO) introUI.overworld.stop();
                 score.writeHighScore();
                 gameOver = true;
                 running = false;
@@ -196,22 +195,24 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
         }
     }
 
-    @Override
-    public void keyTyped(KeyEvent e) { }
-
+    /**
+     * Key bindings:
+     * -------------------------------------------
+     * Debug mode: '`'
+     * Jump: ' ', 'w', 'ARROW UP'
+     * Fall: 's', 'ARROW DOWN'
+     * Pause: 'p', 'ESC'
+     * -------------------------------------------
+     * @param e         key event
+     */
     @Override
     public void keyPressed(KeyEvent e) {
-        /*
-         *  Debug mode key: '`'
-         */
+        // DEBUG
         if (e.getKeyChar() == '`') {
             DEBUG_MODE = !DEBUG_MODE;
         }
 
-        /*
-         * Jump keys: ' ', 'w', 'VK_UP'
-         * Jump key also starts the game and unpause
-         */
+        // JUMP
         if(e.getKeyChar() == ' ' || e.getKeyChar() == 'w' || e.getKeyCode() == KeyEvent.VK_UP) {
             if (!paused && running) {
                 dino.jump();
@@ -228,18 +229,14 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
             }
         }
 
-        /*
-         * Fall keys: 's', 'VK_DOWN'
-         */
+        // FALL
         if(e.getKeyChar() == 's' || e.getKeyCode() == KeyEvent.VK_DOWN) {
             if(!paused && running) {
                 dino.fall();
             }
         }
 
-        /*
-         * Pause key: 'p', ESC
-         */
+        // PAUSE
         if(e.getKeyChar() == 'p' || e.getKeyCode() == KeyEvent.VK_ESCAPE) {
             if (!paused && running) {
                 pauseGame();
@@ -249,6 +246,13 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
         }
     }
 
+
     @Override
-    public void keyReleased(KeyEvent e) { }
+    public void keyReleased(KeyEvent e) {
+        if (e.getKeyChar() == ' ' || e.getKeyChar() == 'w' || e.getKeyCode() == KeyEvent.VK_UP)
+            Dino.jumpRequested = false;
+    }
+
+    @Override
+    public void keyTyped(KeyEvent e) { }
 }

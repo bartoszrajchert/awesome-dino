@@ -12,20 +12,21 @@ public class Sound {
     Clip clip;
     AudioInputStream ais;
     URL path;
+    LineListener event;
 
     public Sound(String path) {
         this.path = getClass().getResource(path);
+        System.out.println("Sound loaded: " + getClass().getResource(path));
     }
 
     public void play() {
         try {
             ais = AudioSystem.getAudioInputStream(path);
             clip = AudioSystem.getClip();
-            clip.addLineListener(event -> {
-                if (event.getType() == LineEvent.Type.STOP) {
-                    clip.close();
-                }
-            });
+            event = event -> {
+                if (event.getType() == LineEvent.Type.STOP) clip.close();
+            };
+            clip.addLineListener(event);
             clip.open(ais);
             clip.start();
         } catch (Exception e) {
@@ -42,5 +43,23 @@ public class Sound {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * It is important to remove line listener here, because
+     * LineListener will try to execute code which can freeze the game
+     * if someone will click fast buttons in longer sounds
+     */
+    public void stop() {
+        clip.removeLineListener(event);
+        clip.stop();
+    }
+
+    public boolean isOpen() {
+        return clip.isOpen();
+    }
+
+    public boolean isNull() {
+        return clip == null;
     }
 }
