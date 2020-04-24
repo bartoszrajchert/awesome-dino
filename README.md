@@ -3,7 +3,7 @@
 ![Version](https://img.shields.io/github/v/tag/rajlu/awesome-dino?label=Version&style=for-the-badge) ![Repo size](https://img.shields.io/github/repo-size/rajlu/awesome-dino?style=for-the-badge) ![Code size](https://img.shields.io/github/languages/code-size/rajlu/awesome-dino?style=for-the-badge)  
 A Java version ot the offline T-Rex chrome game.
 Some features are missing, some additional has been added.
-Game works on ~**60 fps**.
+Game works on ~**60 FPS**.
 
 Game is for my CS project.
 ## Features
@@ -20,9 +20,13 @@ Game is for my CS project.
    - Intro
    - Pause
    - Sounds
-   - **EASTER EGG** _(u need to click somewhere on intro screen)_
+   - **EASTER EGG** _(you need to click somewhere in intro screen)_
 
-## Keybinds:
+## How to start
+1. Clone git
+2. Run from "GameStarter" class
+
+## Keybinds
 ##### Jump: `SPACE`, `w`, `ARROW UP`
 ##### Fall: `s`, `ARROW DOWN`
 ##### Pause: `p`, `ESC`

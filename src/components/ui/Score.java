@@ -17,21 +17,15 @@ public class Score implements Drawable {
     private static final int SCORE_DELTA_TIME = 100 / gameSpeed * 5;
     private static final int SCORE_MAX_HIGH_SCORE = 99999;
 
-    public static int score;
-    private int highScore;
+    private static final DeltaTime DELTA_TIME = new DeltaTime(SCORE_DELTA_TIME);
+    private static final Sound SCORE_SOUND = new Sound("/assets/sounds/score-reached.wav");
 
-    private final DeltaTime deltaTime;
+    private static boolean isPlayed = false;
 
-    private final Sound scoreSound;
-    private boolean isPlayed = false;
+    private static int highScore = readHighScore();
+    public static int score = 0;
 
-    public Score() {
-        score = 0;
-        deltaTime = new DeltaTime(SCORE_DELTA_TIME);
-        scoreSound = new Sound("/assets/sounds/score-reached.wav");
-
-        highScore = readHighScore();
-    }
+    public Score() { }
 
     private String scoreBuilder(int score) {
         StringBuilder ret = new StringBuilder(Integer.toString(score));
@@ -47,7 +41,7 @@ public class Score implements Drawable {
     private void playSound() {
         if (score > 0 && score%100 == 0 && !isPlayed) {
             isPlayed = true;
-            scoreSound.play();
+            SCORE_SOUND.play();
         }
     }
 
@@ -56,6 +50,26 @@ public class Score implements Drawable {
     }
     private String printScore(int score) {
         return score > SCORE_MAX_HIGH_SCORE ? Integer.toString(SCORE_MAX_HIGH_SCORE) : scoreBuilder(score);
+    }
+
+    private static boolean checkFileExistence() {
+        File file = new File(SCORE_FILE_NAME);
+        return file.exists();
+    }
+
+    private static int readHighScore() {
+        long highScore = 0;
+        if (checkFileExistence()) {
+            try {
+                BufferedReader reader = new BufferedReader(new FileReader(SCORE_FILE_NAME));
+                highScore = Long.parseLong(reader.readLine());
+                reader.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        System.out.println("Score system: High score read");
+        return (int) highScore;
     }
 
     /**
@@ -84,29 +98,9 @@ public class Score implements Drawable {
         }
     }
 
-    public boolean checkFileExistence() {
-        File file = new File(SCORE_FILE_NAME);
-        return file.exists();
-    }
-
-    public int readHighScore() {
-        long highScore = 0;
-        if (checkFileExistence()) {
-            try {
-                BufferedReader reader = new BufferedReader(new FileReader(SCORE_FILE_NAME));
-                highScore = Long.parseLong(reader.readLine());
-                reader.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        System.out.println("Score system: High score read");
-        return (int) highScore;
-    }
-
     @Override
     public void update() {
-        if (deltaTime.canExecute()) {
+        if (DELTA_TIME.canExecute()) {
             isPlayed = false;
             GamePanel.isGameSpeedChanged = false;
             score += 1;

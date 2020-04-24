@@ -47,9 +47,11 @@ public class Sound {
     }
 
     /**
+     * It needs to be done before playing song
+     *
      * It is important to remove line listener here, because
      * LineListener will try to execute code which can freeze the game
-     * if someone will click fast buttons in longer sounds
+     * if someone will rapid click buttons in longer sounds
      */
     public void stop() {
         clip.removeLineListener(event);

@@ -14,19 +14,18 @@ import static main.GameWindow.WINDOW_HEIGHT;
 import static main.GameWindow.WINDOW_WIDTH;
 
 public class Background implements Drawable {
-    private ArrayList<ComponentImage> cloudImages;
-    private final BufferedImage cloud;
+    private static final BufferedImage CLOUD_IMAGE = new Resource().getResourceImage("/assets/Cloud.png");
 
     private final int backgroundSpeed = gameSpeed / 3;
 
     private BackgroundColors backgroundColor;
 
-    ComponentImage firstCloud;
-    ComponentImage secondCloud;
-    ComponentImage thirdCloud;
+    private static ArrayList<ComponentImage> cloudImages;
+    private static final ComponentImage firstCloud = new ComponentImage(CLOUD_IMAGE, WINDOW_WIDTH - 700, 40, Color.LIGHT_GRAY);
+    private static final ComponentImage secondCloud = new ComponentImage(CLOUD_IMAGE, WINDOW_WIDTH - 400, 20, Color.LIGHT_GRAY);
+    private static final ComponentImage thirdCloud = new ComponentImage(CLOUD_IMAGE, WINDOW_WIDTH - 200, 80, Color.LIGHT_GRAY);
 
     public Background() {
-        cloud = new Resource().getResourceImage("/assets/Cloud.png");
         backgroundColor = BackgroundColors.DEFAULT;
 
         backgroundInit();
@@ -38,13 +37,9 @@ public class Background implements Drawable {
 
     private void backgroundInit() {
         cloudImages = new ArrayList<>();
-        cloudImages.add(new ComponentImage(cloud, WINDOW_WIDTH - 700, 40, Color.LIGHT_GRAY));
-        cloudImages.add(new ComponentImage(cloud, WINDOW_WIDTH - 400, 20, Color.LIGHT_GRAY));
-        cloudImages.add(new ComponentImage(cloud, WINDOW_WIDTH - 200, 80, Color.LIGHT_GRAY));
-
-        firstCloud = cloudImages.get(0);
-        secondCloud = cloudImages.get(1);
-        thirdCloud = cloudImages.get(2);
+        cloudImages.add(firstCloud);
+        cloudImages.add(secondCloud);
+        cloudImages.add(thirdCloud);
     }
 
     private void changeBackgroundColor() {
@@ -88,7 +83,7 @@ public class Background implements Drawable {
         }
 
         for (ComponentImage clouds : cloudImages) {
-            if (DEBUG_MODE) {
+            if (debugMode) {
                 g.setColor(clouds.debugColor);
                 g.drawRect(clouds.x, clouds.y, clouds.image.getWidth(), clouds.image.getHeight());
             }

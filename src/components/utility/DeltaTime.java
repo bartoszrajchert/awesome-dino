@@ -1,22 +1,18 @@
 package components.utility;
 
 public class DeltaTime {
-    private int deltaTime;
+    private final int DELTA_TIME;
     private long lastTime;
 
     public DeltaTime(int deltaTime) {
-        this.deltaTime = deltaTime;
+        this.DELTA_TIME = deltaTime;
     }
 
     public boolean canExecute() {
-        if (System.currentTimeMillis() - lastTime > deltaTime) {
+        if (System.currentTimeMillis() - lastTime > DELTA_TIME) {
             lastTime = System.currentTimeMillis();
             return true;
         }
         return false;
-    }
-
-    public void setDeltaTime(int deltaTime) {
-        this.deltaTime = deltaTime;
     }
 }

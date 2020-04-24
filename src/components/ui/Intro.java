@@ -15,28 +15,26 @@ import static main.GameWindow.WINDOW_HEIGHT;
 import static main.GameWindow.WINDOW_WIDTH;
 
 public class Intro implements Drawable {
-    public boolean IS_MARIO = false;
+    private static BufferedImage text = new Resource().getResourceImage("/assets/Intro.png");
 
-    private BufferedImage text = new Resource().getResourceImage("/assets/Intro.png");
-    public JLabel label = new JLabel();
+    public JLabel introLabel = new JLabel();
 
     public final Sound overworld = new Sound("/assets/sounds/mario/overworld.wav");
 
     public Intro() {
-        label.setBounds((WINDOW_WIDTH - text.getWidth()) / 2, (WINDOW_HEIGHT - text.getHeight()) / 2 - 50, text.getWidth(), text.getHeight());
-        label.addMouseListener(new MouseAdapter() {
+        introLabel.setBounds((WINDOW_WIDTH - text.getWidth()) / 2, (WINDOW_HEIGHT - text.getHeight()) / 2 - 50, text.getWidth(), text.getHeight());
+        introLabel.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                IS_MARIO = true;
                 changeIntroTextToMario();
                 overworld.playInLoop();
-                Dino.setMario();
+                Dino.isMario = true;
             }
         });
     }
 
     public void setVisible(boolean val) {
-        label.setVisible(val);
+        introLabel.setVisible(val);
     }
 
     public void changeIntroTextToMario() {text = new Resource().getResourceImage("/assets/Intro-mario.png");}

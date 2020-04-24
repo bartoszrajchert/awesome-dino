@@ -10,20 +10,20 @@ import java.util.ArrayList;
  */
 
 public class Animation {
+    private final DeltaTime DELTA_TIME;
+
     private ArrayList<BufferedImage> frames;
     private int index;
-
-    private DeltaTime deltaTime;
 
     public Animation(int deltaTime) {
         frames = new ArrayList<>();
         index = 0;
 
-        this.deltaTime = new DeltaTime(deltaTime);
+        this.DELTA_TIME = new DeltaTime(deltaTime);
     }
     
     public void update() {
-        if (deltaTime.canExecute()){
+        if (DELTA_TIME.canExecute()){
             index++;
             if (index >= frames.size()) {
                 index = 0;

@@ -18,17 +18,17 @@ import static main.GameWindow.WINDOW_HEIGHT;
 import static main.GameWindow.WINDOW_WIDTH;
 
 public class GamePanel extends JPanel implements Runnable, KeyListener {
-    public static boolean DEBUG_MODE = false;
-
-    public static final int GAME_FPS = 60;
-    public static final float GAME_GRAVITY = 0.64f;
     private static final int GAME_START_SPEED = 5;
-    public static int GAME_MAX_SPEED = 12;
+    private static final int GAME_FPS = 60;
+    private static final int GAME_MAX_SPEED = 12;
 
-    public static int gameSpeed;
+    public static final float GAME_GRAVITY = 0.64f;
+
+    private Thread mainThread = new Thread(this);
+
+    public static boolean debugMode = false;
+    public static int gameSpeed = GAME_START_SPEED;
     public static boolean isGameSpeedChanged = false;
-
-    private Thread mainThread;
 
     public boolean running = false;
     public boolean paused = false;
@@ -36,40 +36,24 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
     public boolean intro = true;
     final Object pauseLock = new Object();
 
-    Dino dino;
-    Ground ground;
-    Obstacles obstacles;
-    Background background;
+    Dino dino = new Dino();
+    Ground ground = new Ground();
+    Obstacles obstacles = new Obstacles();
+    Background background = new Background();
 
-    Score scoreUI;
-    GameOver gameOverUI;
-    Paused pausedUI;
-    Intro introUI;
+    Score scoreUI = new Score();
+    GameOver gameOverUI = new GameOver();
+    Paused pausedUI = new Paused();
+    Intro introUI = new Intro();
 
     public GamePanel() {
-        System.out.println("\nStartup log");
-        System.out.println("-----------------------------------------------------");
-
         setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
-
-        gameSpeed = GAME_START_SPEED;
-
-        dino = new Dino();
-        ground = new Ground();
-        obstacles = new Obstacles();
-        background = new Background();
-
-        scoreUI = new Score();
-        gameOverUI = new GameOver();
-        pausedUI = new Paused();
-        introUI = new Intro();
-
         setLayout(null);
-        add(introUI.label);
-
-        mainThread = new Thread(this); //TODO why "this"
-        mainThread.start();
         setVisible(true);
+
+        add(introUI.introLabel);
+
+        mainThread.start();
     }
 
     public void startGame() {
@@ -94,14 +78,14 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
         ground.reset();
         background.reset();
 
-        if (introUI.IS_MARIO) {
+        if (Dino.isMario) {
             introUI.overworld.playInLoop();
 
             // It prevents from layering sounds
             if (dino.gameOverSound.isOpen()) dino.gameOverSound.stop();
         }
 
-        mainThread = new Thread(this); //TODO why "this"
+        mainThread = new Thread(this);
         mainThread.start();
     }
 
@@ -119,7 +103,7 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
     }
 
     private void changeGameSpeed() {
-        if (scoreUI.score > 0 && scoreUI.score%260 == 0 && !isGameSpeedChanged && gameSpeed < GAME_MAX_SPEED) {
+        if (Score.score > 0 && Score.score %260 == 0 && !isGameSpeedChanged && gameSpeed < GAME_MAX_SPEED) {
             isGameSpeedChanged = true;
             gameSpeed += 1;
         }
@@ -149,10 +133,7 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
 
     /**
      * MAIN GAME LOOP
-     *
-     * I'm aware that Thread.sleep() is not a good practice but it is
-     * good enough for this game.
-     *
+     * It is probably the simplest version
      * ------------------------------------------------------------------------
      * Good resources:
      *  - https://gamedev.stackexchange.com/questions/160329/java-game-loop-efficiency
@@ -167,6 +148,10 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
                 Thread.sleep(msPerFrame);
             } catch (InterruptedException e) {
                 e.printStackTrace();
+            }
+
+            if (Dino.isMario && !Dino.marioLoaded) {
+                dino.setMario();
             }
 
             repaint();
@@ -200,7 +185,7 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
 
             if (obstacles.isCollision()) {
                 dino.die();
-                if (introUI.IS_MARIO) introUI.overworld.stop();
+                if (Dino.isMario) introUI.overworld.stop();
                 scoreUI.writeHighScore();
                 gameOver = true;
                 running = false;
@@ -227,7 +212,7 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
     public void keyPressed(KeyEvent e) {
         // DEBUG
         if (e.getKeyChar() == '`') {
-            DEBUG_MODE = !DEBUG_MODE;
+            debugMode = !debugMode;
         }
 
         // JUMP
@@ -273,7 +258,7 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
     @Override
     public void keyReleased(KeyEvent e) {
         if (e.getKeyChar() == ' ' || e.getKeyChar() == 'w' || e.getKeyCode() == KeyEvent.VK_UP)
-            Dino.jumpRequested = false;
+            dino.jumpRequested = false;
     }
 
     @Override

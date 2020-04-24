@@ -9,42 +9,60 @@ import java.awt.image.BufferedImage;
 import static components.ground.Ground.GROUND_Y;
 
 public class ObstacleImage {
+    private final ComponentImage OBSTACLE_IMAGE;
     private int spaceBehind;
 
     public Coordinates coordinates;
 
-    private ComponentImage image;
+    public ObstacleImage(BufferedImage OBSTACLE_IMAGE) {
+        this.OBSTACLE_IMAGE = new ComponentImage(OBSTACLE_IMAGE, 0, GROUND_Y - OBSTACLE_IMAGE.getHeight(), Color.red);
+        this.spaceBehind = 0;
 
-    public ObstacleImage(BufferedImage image, int x) {
-        this.image = new ComponentImage(image, x, GROUND_Y - image.getHeight(), Color.red);
-
-        coordinates = new Coordinates(this.image.x, this.image.y, image.getWidth(), image.getHeight());
+        coordinates = new Coordinates(this.OBSTACLE_IMAGE.x, this.OBSTACLE_IMAGE.y, OBSTACLE_IMAGE.getWidth(), OBSTACLE_IMAGE.getHeight());
     }
 
+    public ObstacleImage(BufferedImage OBSTACLE_IMAGE, int spaceBehind) {
+        this.OBSTACLE_IMAGE = new ComponentImage(OBSTACLE_IMAGE, 0, GROUND_Y - OBSTACLE_IMAGE.getHeight(), Color.red);
+        this.spaceBehind = spaceBehind;
+
+        coordinates = new Coordinates(this.OBSTACLE_IMAGE.x, this.OBSTACLE_IMAGE.y, OBSTACLE_IMAGE.getWidth(), OBSTACLE_IMAGE.getHeight());
+    }
+
+    public ObstacleImage(BufferedImage OBSTACLE_IMAGE, int x, int spaceBehind) {
+        this.OBSTACLE_IMAGE = new ComponentImage(OBSTACLE_IMAGE, x, GROUND_Y - OBSTACLE_IMAGE.getHeight(), Color.red);
+        this.spaceBehind = spaceBehind;
+
+        coordinates = new Coordinates(this.OBSTACLE_IMAGE.x, this.OBSTACLE_IMAGE.y, OBSTACLE_IMAGE.getWidth(), OBSTACLE_IMAGE.getHeight());
+    }
+
+    // Setters ---------------------------------------------------------------
     public void setSpaceBehind(int spaceBehind) {
         this.spaceBehind = spaceBehind;
     }
 
-    public int getSpaceBehind() {
-        return spaceBehind;
-    }
-
     public void setX(int x) {
-        this.image.x = x;
+        this.OBSTACLE_IMAGE.x = x;
         coordinates.x = x;
     }
 
+    // Getters ---------------------------------------------------------------
     public int getX() {
-        return image.x;
-    }
-    public int getY() {
-        return image.y;
-    }
-    public Color getDebugColor() {
-        return image.debugColor;
+        return OBSTACLE_IMAGE.x;
     }
 
-    public BufferedImage getImage() {
-        return image.image;
+    public int getY() {
+        return OBSTACLE_IMAGE.y;
+    }
+
+    public Color getDebugColor() {
+        return OBSTACLE_IMAGE.debugColor;
+    }
+
+    public BufferedImage getOBSTACLE_IMAGE() {
+        return OBSTACLE_IMAGE.image;
+    }
+
+    public int getSpaceBehind() {
+        return spaceBehind;
     }
 }

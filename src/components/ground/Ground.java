@@ -3,57 +3,52 @@ package components.ground;
 import components.utility.ComponentImage;
 import interfaces.Drawable;
 import components.utility.Resource;
+import main.GamePanel;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
-import static main.GamePanel.*;
-
 public class Ground implements Drawable {
-    public static final int GROUND_Y = 180;
     private static final int GROUND_Y_IMAGE_OFFSET = -9;
+    private static final BufferedImage GROUND_IMAGE = new Resource().getResourceImage("/assets/Ground.png");
+    public static final int GROUND_Y = 180;
     
-    private ArrayList<ComponentImage> groundImages;
-    private BufferedImage image;
+    private static ArrayList<ComponentImage> groundImages;
 
-    ComponentImage first;
-    ComponentImage second;
+    private static final ComponentImage firstGround = new ComponentImage(GROUND_IMAGE, 0, Color.green);
+    private static final ComponentImage secondGround = new ComponentImage(GROUND_IMAGE, GROUND_IMAGE.getWidth(), Color.blue);
 
     public Ground() {
-        image = new Resource().getResourceImage("/assets/Ground.png");
-
         groundInit();
     }
 
-    public void groundInit() {
+    private void groundInit() {
         groundImages = new ArrayList<>();
-        groundImages.add(new ComponentImage(image, 0, Color.green));
-        groundImages.add(new ComponentImage(image, groundImages.get(0).image.getWidth(), Color.blue));
 
-        first = groundImages.get(0);
-        second = groundImages.get(1);
+        groundImages.add(firstGround);
+        groundImages.add(secondGround);
     }
 
     /**
-     * @see ComponentImage#x   Defines also inequalities arising
-     *                      from updating x before changing GroundImage possition (I think)
+     * @see ComponentImage#x    Defines also inequalities arising
+     *                          from updating x before changing GroundImage possition (I think)
      */
     public void update() {
-        first.x -= gameSpeed;
-        second.x -= gameSpeed;
+        firstGround.x -= GamePanel.gameSpeed;
+        secondGround.x -= GamePanel.gameSpeed;
 
-        if (first.x <= -first.image.getWidth()) {
-            first.x = second.image.getWidth() + second.x;
+        if (firstGround.x <= -firstGround.image.getWidth()) {
+            firstGround.x = secondGround.image.getWidth() + secondGround.x;
         }
-        if (second.x <= -second.image.getWidth()) {
-            second.x = first.image.getWidth() + first.x;
+        if (secondGround.x <= -secondGround.image.getWidth()) {
+            secondGround.x = firstGround.image.getWidth() + firstGround.x;
         }
     }
 
     public void draw(Graphics g) {
         for (ComponentImage ground : groundImages) {
-            if (DEBUG_MODE) {
+            if (GamePanel.debugMode) {
                 g.setColor(ground.debugColor);
                 g.drawLine(ground.x, GROUND_Y, ground.image.getWidth() + ground.x, GROUND_Y);
             }
