@@ -180,6 +180,7 @@ public class Dino implements Drawable {
     }
 
     public static void setMario() {
+        System.out.println("\nMARIOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO");
         DINO_RUNNING_ANIMATION_DELTA_TIME = 100;
 
         idleImage = new Resource().getResourceImage("/assets/mario/Mario-welcome.png");
@@ -194,5 +195,6 @@ public class Dino implements Drawable {
 
         constructedCoordinates = new ArrayList<>();
         constructedCoordinates.add(new Coordinates((int) x, (int) y, idleImage.getWidth(), idleImage.getHeight()));
+        System.out.println("MARIOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO");
     }
 }

@@ -4,15 +4,16 @@ import javax.sound.sampled.*;
 import java.net.URL;
 
 /**
- * Resources
+ * Resources:
  *  - https://stackoverflow.com/questions/2416935/how-to-play-wav-files-with-java
  */
 
 public class Sound {
-    Clip clip;
-    AudioInputStream ais;
-    URL path;
-    LineListener event;
+    private final URL path;
+
+    private Clip clip;
+    private AudioInputStream ais;
+    private LineListener event;
 
     public Sound(String path) {
         this.path = getClass().getResource(path);

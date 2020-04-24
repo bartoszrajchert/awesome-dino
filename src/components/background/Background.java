@@ -1,5 +1,6 @@
 package components.background;
 
+import components.ui.Score;
 import components.utility.ComponentImage;
 import components.utility.Resource;
 import interfaces.Drawable;
@@ -14,11 +15,11 @@ import static main.GameWindow.WINDOW_WIDTH;
 
 public class Background implements Drawable {
     private ArrayList<ComponentImage> cloudImages;
-    private BufferedImage cloud;
+    private final BufferedImage cloud;
 
-    private int backgroundSpeed = gameSpeed / 3;
+    private final int backgroundSpeed = gameSpeed / 3;
 
-    private static BackgroundColors whichBackgroundColor;
+    private BackgroundColors backgroundColor;
 
     ComponentImage firstCloud;
     ComponentImage secondCloud;
@@ -26,13 +27,13 @@ public class Background implements Drawable {
 
     public Background() {
         cloud = new Resource().getResourceImage("/assets/Cloud.png");
-        whichBackgroundColor = BackgroundColors.DEFAULT;
+        backgroundColor = BackgroundColors.DEFAULT;
 
         backgroundInit();
     }
 
-    public static void setWhichBackgroundColor(BackgroundColors whichBackgroundColor) {
-        Background.whichBackgroundColor = whichBackgroundColor;
+    public void setBackgroundColor(BackgroundColors backgroundColor) {
+        this.backgroundColor = backgroundColor;
     }
 
     private void backgroundInit() {
@@ -44,6 +45,14 @@ public class Background implements Drawable {
         firstCloud = cloudImages.get(0);
         secondCloud = cloudImages.get(1);
         thirdCloud = cloudImages.get(2);
+    }
+
+    private void changeBackgroundColor() {
+        if (Score.score > 0 && Score.score%600 == 0 && backgroundColor != BackgroundColors.DARK) {
+            setBackgroundColor(BackgroundColors.DARK);
+        } else if (Score.score > 0 && Score.score%800 == 0) {
+            setBackgroundColor(BackgroundColors.DEFAULT);
+        }
     }
 
     @Override
@@ -63,11 +72,13 @@ public class Background implements Drawable {
         if (thirdCloud.x <= -thirdCloud.image.getWidth()) {
             thirdCloud.x = WINDOW_WIDTH;
         }
+
+        changeBackgroundColor();
     }
 
     @Override
     public void draw(Graphics g) {
-        switch (whichBackgroundColor){
+        switch (backgroundColor){
             case DEFAULT:
                 break;
             case DARK:
@@ -88,6 +99,6 @@ public class Background implements Drawable {
     @Override
     public void reset() {
         backgroundInit();
-        whichBackgroundColor = BackgroundColors.DEFAULT;
+        backgroundColor = BackgroundColors.DEFAULT;
     }
 }

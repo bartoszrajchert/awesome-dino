@@ -23,9 +23,10 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
     public static final int GAME_FPS = 60;
     public static final float GAME_GRAVITY = 0.64f;
     private static final int GAME_START_SPEED = 5;
-    public static int GAME_MAX_SPEED = 15;
+    public static int GAME_MAX_SPEED = 12;
 
     public static int gameSpeed;
+    public static boolean isGameSpeedChanged = false;
 
     private Thread mainThread;
 
@@ -40,12 +41,15 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
     Obstacles obstacles;
     Background background;
 
-    Score score;
+    Score scoreUI;
     GameOver gameOverUI;
     Paused pausedUI;
     Intro introUI;
 
     public GamePanel() {
+        System.out.println("\nStartup log");
+        System.out.println("-----------------------------------------------------");
+
         setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
 
         gameSpeed = GAME_START_SPEED;
@@ -55,7 +59,7 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
         obstacles = new Obstacles();
         background = new Background();
 
-        score = new Score();
+        scoreUI = new Score();
         gameOverUI = new GameOver();
         pausedUI = new Paused();
         introUI = new Intro();
@@ -69,8 +73,8 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
     }
 
     public void startGame() {
-        System.out.println("\n=====================GAME LOG=====================");
-        System.out.println("Let the game begin\n");
+        System.out.println("\nGame log");
+        System.out.println("-----------------------------------------------------");
 
         running = true;
         intro = false;
@@ -83,7 +87,7 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
 
         gameSpeed = GAME_START_SPEED;
 
-        score.reset();
+        scoreUI.reset();
 
         dino.reset();
         obstacles.reset();
@@ -103,17 +107,29 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
 
     public void pauseGame() {
         paused = true;
-        System.out.println("\nPaused");
+        System.out.println("Paused");
     }
 
     public void resumeGame() {
         synchronized (pauseLock) {
             paused = false;
             pauseLock.notify();
-            System.out.println("\nResumed");
+            System.out.println("Resumed");
         }
     }
 
+    private void changeGameSpeed() {
+        if (scoreUI.score > 0 && scoreUI.score%260 == 0 && !isGameSpeedChanged && gameSpeed < GAME_MAX_SPEED) {
+            isGameSpeedChanged = true;
+            gameSpeed += 1;
+        }
+    }
+
+    /**
+     * MAIN PAINT METHOD
+     * --------------------------------------------------------
+     * @param g     Graphics
+     */
     @Override
     public void paint(Graphics g) {
         super.paint(g);
@@ -122,7 +138,7 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
 
         if (paused) pausedUI.draw(g);
         if (gameOver) gameOverUI.draw(g);
-        if (!intro) score.draw(g);
+        if (!intro) scoreUI.draw(g);
 
         ground.draw(g);
         dino.draw(g);
@@ -142,7 +158,6 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
      *  - https://gamedev.stackexchange.com/questions/160329/java-game-loop-efficiency
      *  - https://stackoverflow.com/questions/18283199/java-main-game-loop
      */
-
     @Override
     public void run() {
         // INTRO LOOP FOR EASTER EGG
@@ -175,7 +190,9 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
             }
 
             // GAME LOGIC
-            score.update();
+            changeGameSpeed();
+
+            scoreUI.update();
             background.update();
             dino.update();
             ground.update();
@@ -184,7 +201,7 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
             if (obstacles.isCollision()) {
                 dino.die();
                 if (introUI.IS_MARIO) introUI.overworld.stop();
-                score.writeHighScore();
+                scoreUI.writeHighScore();
                 gameOver = true;
                 running = false;
                 System.out.println("Game over");
@@ -196,14 +213,15 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
     }
 
     /**
-     * Key bindings:
+     * KEY BINDINGS
+     *
      * -------------------------------------------
      * Debug mode: '`'
      * Jump: ' ', 'w', 'ARROW UP'
      * Fall: 's', 'ARROW DOWN'
      * Pause: 'p', 'ESC'
      * -------------------------------------------
-     * @param e         key event
+     * @param e         KeyEvent
      */
     @Override
     public void keyPressed(KeyEvent e) {
@@ -246,7 +264,12 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
         }
     }
 
-
+    /**
+     * Just checking if someone change mind to jump
+     * right after hitting ground
+     * --------------------------------------------------------
+     * @param e     KeyEvent
+     */
     @Override
     public void keyReleased(KeyEvent e) {
         if (e.getKeyChar() == ' ' || e.getKeyChar() == 'w' || e.getKeyCode() == KeyEvent.VK_UP)

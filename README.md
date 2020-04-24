@@ -1,28 +1,41 @@
 ![Picture of the game](pic-of-the-game.png)
-## AWESOME DINO
+## 🦖 AWESOME DINO
+![Version](https://img.shields.io/github/v/tag/rajlu/awesome-dino?label=Version&style=for-the-badge) ![Repo size](https://img.shields.io/github/repo-size/rajlu/awesome-dino?style=for-the-badge) ![Code size](https://img.shields.io/github/languages/code-size/rajlu/awesome-dino?style=for-the-badge)  
 A Java version ot the offline T-Rex chrome game.
 Some features are missing, some additional has been added.
 Game works on ~**60 fps**.
 
 Game is for my CS project.
-### Features
-   - Obstacles manager
+## Features
+   - Obstacles
+   - Collisions
    - Moving ground
-   - Jump
-   - Score & High Score _(W/R file)_
-   - Faster fall
-   - Leveling system
-   - Pause
    - Moving background
    - Changing background color
+   - Jump
+   - Faster fall
+   - Animations
+   - Score & High Score _(W/R file)_
+   - Leveling system
+   - Intro
+   - Pause
    - Sounds
-   - **EASTER EGG** _(search for it in intro screen)_
-   - Collisions + array of collision box (for example) 
-   ![Picture of dino collision box](dino-collision-box.png)
+   - **EASTER EGG** _(u need to click somewhere on intro screen)_
 
-### Keybinds:
+## Keybinds:
 ##### Jump: `SPACE`, `w`, `ARROW UP`
 ##### Fall: `s`, `ARROW DOWN`
 ##### Pause: `p`, `ESC`
 ##### Debug mode: <code>` (backtick)</code>
 
+## TODO
+- Pterodactyl
+- Hardcore mode
+- Even better collisions
+- Better moving background
+- Better main game loop and FPS system
+- Background color fade transition
+- ... and most importantly **Better code (like always)**
+
+## Thanks for watching
+![Mario](src/assets/mario/Mario-welcome.png)

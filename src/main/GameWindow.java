@@ -3,8 +3,6 @@ package main;
 import javax.swing.*;
 
 public class GameWindow {
-    private static JFrame mainGameWindow;
-
     private static final String WINDOW_TITLE = "AWESOME DINO";
     public static final int WINDOW_WIDTH = 800;
     public static final int WINDOW_HEIGHT = 240;
@@ -12,7 +10,7 @@ public class GameWindow {
     private static final boolean WINDOW_ALWAYS_ON_TOP = false;
 
     public GameWindow() {
-        mainGameWindow = new JFrame(WINDOW_TITLE);
+        JFrame mainGameWindow = new JFrame(WINDOW_TITLE);
         mainGameWindow.setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
         mainGameWindow.setResizable(WINDOW_RESIZABLE);
 

@@ -1,31 +1,29 @@
 package components.ui;
 
-import components.background.Background;
-import components.background.BackgroundColors;
 import components.utility.Sound;
 import components.utility.DeltaTime;
 import interfaces.Drawable;
+import main.GamePanel;
 
 import java.awt.*;
 import java.io.*;
 
-import static main.GamePanel.GAME_MAX_SPEED;
 import static main.GamePanel.gameSpeed;
 import static main.GameWindow.WINDOW_WIDTH;
 
 public class Score implements Drawable {
     private static final String SCORE_FILE_NAME = "highscore.txt";
-    public static final int SCORE_MAX_ZEROS = 5;
-    public static final int SCORE_DELTA_TIME = 100 / gameSpeed * 5;
+    private static final int SCORE_MAX_ZEROS = 5;
+    private static final int SCORE_DELTA_TIME = 100 / gameSpeed * 5;
+    private static final int SCORE_MAX_HIGH_SCORE = 99999;
 
-    private int score;
+    public static int score;
     private int highScore;
 
     private final DeltaTime deltaTime;
 
     private final Sound scoreSound;
     private boolean isPlayed = false;
-    private boolean isChanged = false;
 
     public Score() {
         score = 0;
@@ -46,21 +44,6 @@ public class Score implements Drawable {
         return ret.toString();
     }
 
-    private void changeGameSpeed() {
-        if (score > 0 && score%220 == 0 && !isChanged && gameSpeed < GAME_MAX_SPEED) {
-            isChanged = true;
-            gameSpeed += 1;
-        }
-    }
-
-    private void changeBackgroundColor() {
-        if (score > 0 && score%1200 == 0) {
-            Background.setWhichBackgroundColor(BackgroundColors.DARK);
-        } else if (score > 0 && score%1800 == 0) {
-            Background.setWhichBackgroundColor(BackgroundColors.DEFAULT);
-        }
-    }
-
     private void playSound() {
         if (score > 0 && score%100 == 0 && !isPlayed) {
             isPlayed = true;
@@ -70,6 +53,9 @@ public class Score implements Drawable {
 
     private boolean isHighScore() {
         return highScore < score;
+    }
+    private String printScore(int score) {
+        return score > SCORE_MAX_HIGH_SCORE ? Integer.toString(SCORE_MAX_HIGH_SCORE) : scoreBuilder(score);
     }
 
     /**
@@ -94,7 +80,7 @@ public class Score implements Drawable {
                 e.printStackTrace();
             }
             highScore = score;
-            System.out.println("New high score");
+            System.out.println("Score system: New high score");
         }
     }
 
@@ -104,40 +90,37 @@ public class Score implements Drawable {
     }
 
     public int readHighScore() {
-        int highScore = 0;
+        long highScore = 0;
         if (checkFileExistence()) {
             try {
                 BufferedReader reader = new BufferedReader(new FileReader(SCORE_FILE_NAME));
-                highScore = Integer.parseInt(reader.readLine());
+                highScore = Long.parseLong(reader.readLine());
                 reader.close();
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
-        System.out.println("High score read");
-        return highScore;
+        System.out.println("Score system: High score read");
+        return (int) highScore;
     }
 
     @Override
     public void update() {
         if (deltaTime.canExecute()) {
             isPlayed = false;
-            isChanged = false;
+            GamePanel.isGameSpeedChanged = false;
             score += 1;
+            playSound();
         }
-
-        playSound();
-        changeGameSpeed();
-        changeBackgroundColor();
     }
 
     @Override
     public void draw(Graphics g) {
         g.setColor(Color.GRAY);
         g.setFont(new Font("Consolas", Font.BOLD, 18));
-        g.drawString(scoreBuilder(score), WINDOW_WIDTH - 100, 40);
+        g.drawString(printScore(score), WINDOW_WIDTH - 100, 40);
         g.setColor(Color.LIGHT_GRAY);
-        g.drawString("HI " + scoreBuilder(highScore), WINDOW_WIDTH - 200, 40);
+        g.drawString("HI " + printScore(highScore), WINDOW_WIDTH - 200, 40);
     }
 
     @Override
