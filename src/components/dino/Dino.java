@@ -27,6 +27,7 @@ public class Dino implements Drawable {
 
     private static BufferedImage idleImage = new Resource().getResourceImage("/assets/Dino-stand.png");
     private static BufferedImage jumpImage = new Resource().getResourceImage("/assets/Dino-stand.png");
+    private static BufferedImage fallImage = new Resource().getResourceImage("/assets/Dino-stand.png");
     private static Animation runAnimation = new Animation(DINO_RUNNING_ANIMATION_DELTA_TIME);
     private static BufferedImage dieImage = new Resource().getResourceImage("/assets/Dino-big-eyes.png");
 
@@ -87,13 +88,13 @@ public class Dino implements Drawable {
                 if (jumpSound.isOpen()) jumpSound.stop();
             }
             jumpSound.play();
-        } else if (dinoState == DinoStates.JUMPING) {
+        } else if (isInAir()) {
             jumpRequested = true;
         }
     }
 
     public void fall() {
-        if (dinoState == DinoStates.JUMPING) {
+        if (isInAir()) {
             speedY = DINO_FALL_STRENGTH;
             y += speedY;
         }
@@ -104,12 +105,17 @@ public class Dino implements Drawable {
         gameOverSound.play();
     }
 
+    public boolean isInAir() {
+        return dinoState == DinoStates.JUMPING || dinoState == DinoStates.FALL;
+    }
+
     public void setMario() {
         System.out.println("\nMARIOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO");
         DINO_RUNNING_ANIMATION_DELTA_TIME = 100;
 
         idleImage = new Resource().getResourceImage("/assets/mario/Mario-welcome.png");
         jumpImage = new Resource().getResourceImage("/assets/mario/Mario-jump.png");
+        fallImage = new Resource().getResourceImage("/assets/mario/Mario-fall.png");
         runAnimation = new Animation(DINO_RUNNING_ANIMATION_DELTA_TIME);
         runAnimation.addFrame(new Resource().getResourceImage("/assets/mario/Mario-left-up.png"));
         runAnimation.addFrame(new Resource().getResourceImage("/assets/mario/Mario-right-up.png"));
@@ -140,6 +146,9 @@ public class Dino implements Drawable {
             case JUMPING:
                 g.drawImage(jumpImage, (int) X, (int)y, null);
                 break;
+            case FALL:
+                g.drawImage(fallImage, (int) X, (int)y, null);
+                break;
             case RUNNING:
                 runAnimation.update();
                 g.drawImage(runAnimation.getFrame(), (int) X, (int)y, null);
@@ -160,10 +169,13 @@ public class Dino implements Drawable {
                 jump();
                 jumpRequested = false;
             }
-        } else if (dinoState == DinoStates.JUMPING){
+        } else if (isInAir()){
             speedY += GAME_GRAVITY;
             y += speedY;
             TEMP_y = y;
+
+            if (speedY > 0)
+                dinoState = DinoStates.FALL;
         }
         if (constructedCoordinates.size() > 1) {
             constructedCoordinates.get(0).x = (int) X;
@@ -178,7 +190,6 @@ public class Dino implements Drawable {
             constructedCoordinates.get(0).x = (int) X;
             constructedCoordinates.get(0).y = (int) y;
         }
-
     }
 
     @Override

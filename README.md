@@ -1,4 +1,4 @@
-![Picture of the game](pic-of-the-game.png)
+![Picture of the game](gamepicture.png)
 ## 🦖 AWESOME DINO
 ![Version](https://img.shields.io/github/v/tag/rajlu/awesome-dino?label=Version&style=for-the-badge) ![Repo size](https://img.shields.io/github/repo-size/rajlu/awesome-dino?style=for-the-badge) ![Code size](https://img.shields.io/github/languages/code-size/rajlu/awesome-dino?style=for-the-badge)  
 A Java version ot the offline T-Rex chrome game.
@@ -42,4 +42,8 @@ Game is for my CS project.
 - ... and most importantly **Better code (like always)**
 
 ## Thanks for watching
+![Mario](src/assets/mario/Mario-welcome.png)
+![Mario](src/assets/mario/Mario-welcome.png)
+![Mario](src/assets/mario/Mario-welcome.png)
+![Mario](src/assets/mario/Mario-welcome.png)
 ![Mario](src/assets/mario/Mario-welcome.png)

@@ -115,8 +115,8 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
      * @param g     Graphics
      */
     @Override
-    public void paint(Graphics g) {
-        super.paint(g);
+    public void paintComponent(Graphics g) {
+        super.paintComponent(g);
 
         background.draw(g);
 
@@ -157,8 +157,10 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
             repaint();
         }
 
+
         // MAIN GAME LOOP
         while(running) {
+
             // GAME TIMING
             try {
                 int msPerFrame = 1000 / GAME_FPS;
